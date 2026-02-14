@@ -1,0 +1,20 @@
+# Math Workbook Configuration
+workbook_name: "Final_Math_Practice.pdf"
+
+tiers:
+  - name: "Zufar"
+    min_top: 599
+    max_top: 999
+    min_bot: 25
+    max_bot: 555
+    operation: "-"
+    pages: 2
+
+  - name: "Rizqi"
+    min_top: 499
+    max_top: 999
+    min_bot: 25
+    max_bot: 488
+    operation: "-"
+    pages: 2
+
