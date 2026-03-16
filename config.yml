@@ -9,6 +9,7 @@ tiers:
     max_bot: 555
     operation: "-"
     pages: 2
+    layout: "expanded"
 
   - name: "Rizqi"
     min_top: 499
@@ -17,4 +18,14 @@ tiers:
     max_bot: 488
     operation: "-"
     pages: 2
+    layout: "list"
+
+  - name: "Akif"
+    min_top: 399
+    max_top: 899
+    min_bot: 25
+    max_bot: 388
+    operation: "+"
+    pages: 2
+    layout: "grid"
 
