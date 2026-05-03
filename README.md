@@ -10,9 +10,10 @@ A Python-based utility to generate customizable math practice worksheets in PDF 
     - *List*: Horizontal equations with result lines (40 problems/page).
     - *Grid*: Problems contained within boxed cells (50 problems/page).
 - **Smart Logic:**
-    - Supports Addition (+) and Subtraction (-).
+    - Supports Addition (+), Subtraction (-), Multiplication (*), and Division (/).
     - Automatic subtraction correction to ensure positive results.
     - Dynamic font sizing and alignment based on the selected layout.
+    - Intelligent division generation using digit constraints.
 - **Automated Answer Key:** Generates a comprehensive answer key at the end of the PDF, indexed by Tier and Page.
 
 ## Installation
@@ -26,22 +27,36 @@ git clone --depth=1 https://github.com/akirasy/MathWorkbook.git
 > Python dependencies is included in this repository.
 > There is no need to install any python module.
 
-## Configuration
+## Configuration (`config.yml`)
 
-Edit the `config.yml` file to define your workbook structure:
+The `config.yml` file defines your workbook structure. Parameters change based on the selected `operation`.
 
-    workbook_name: "Final_Math_Practice.pdf"
-    
-    tiers:
-      - name: "Zufar"
-        min_top: 599
-        max_top: 999
-        min_bot: 25
-        max_bot: 555
-        operation: "-"
-        pages: 2
-        layout: "expanded" # Options: expanded, list, grid
-    
+### 1. Standard Operations (+, -, *)
+
+Use these for addition, subtraction, or multiplication.
+```
+- name: "Zufar"
+  min_top: 2
+  max_top: 9
+  min_bot: 2
+  max_bot: 9
+  operation: "x"
+  pages: 4
+  layout: "grid"
+```
+
+### 2. Division Operation (/)
+
+For division, the script uses digit-based constraints instead of min/max values.
+```
+- name: "Sulaiman"
+  dividend_digit: 3 
+  divisor_digit: 1
+  operation: "/"
+  pages: 2
+  layout: "expanded"
+```
+
 ### Layout Comparison
 
 | Layout | Problems per Page | Best For |
@@ -54,6 +69,8 @@ Edit the `config.yml` file to define your workbook structure:
 
 Run the generator from your terminal:
 
-    python main.py
+```
+python main.py
+```
 
 The PDF will be generated using the name specified in your configuration file.

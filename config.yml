@@ -2,30 +2,36 @@
 workbook_name: "Final_Math_Practice.pdf"
 
 tiers:
-  - name: "Zufar"
-    min_top: 599
-    max_top: 999
-    min_bot: 25
-    max_bot: 555
-    operation: "-"
+  - name: "Sulaiman"
+    dividend_digit: 3 
+    divisor_digit: 1
+    operation: "/"
     pages: 2
     layout: "expanded"
 
+  - name: "Zufar"
+    min_top: 2
+    max_top: 9
+    min_bot: 2
+    max_bot: 9
+    operation: "x"
+    pages: 2
+    layout: "grid"
+
   - name: "Rizqi"
     min_top: 499
-    max_top: 999
-    min_bot: 25
-    max_bot: 488
-    operation: "-"
+    max_top: 955
+    min_bot: 99
+    max_bot: 499
+    operation: "+"
     pages: 2
     layout: "list"
 
   - name: "Akif"
-    min_top: 399
-    max_top: 899
-    min_bot: 25
-    max_bot: 388
-    operation: "+"
+    min_top: 499
+    max_top: 955
+    min_bot: 99
+    max_bot: 499
+    operation: "-"
     pages: 2
-    layout: "grid"
-
+    layout: "expanded"

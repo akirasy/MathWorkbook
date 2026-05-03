@@ -32,8 +32,8 @@ class MathPDF(FPDF):
         # Draw Math Problem
         self.set_font("Courier", "B", 14)
         self.set_xy(x, y)
-
-        self.cell(28, 10, f"{str(top).rjust(3)} {op} {str(bot).rjust(3)}", ln=False, align="L")
+        display_op = "÷" if op == "/" else op
+        self.cell(28, 10, f"{str(top).rjust(3)} {display_op} {str(bot).rjust(3)}", ln=False, align="L")
         self.cell(8, 10, "=", ln=False, align="C")
         self.cell(20, 10, "_______", ln=False, align="L")
 
@@ -47,10 +47,33 @@ class MathPDF(FPDF):
         self.rect(x, y, 35, 15)
         self.set_font("Helvetica", "B", 10)
         self.set_xy(x + 6, y + 2)
-        self.cell(28, 5, f"{top} {op} {bot}", ln=False, align="L")
+        display_op = "÷" if op == "/" else op
+        self.cell(28, 5, f"{top} {display_op} {bot}", ln=False, align="L")
         self.set_xy(x + 5, y + 8)
         self.set_font("Helvetica", "", 8)
         self.cell(28, 5, "Ans: ________", ln=False, align="L")
+
+    def draw_problem_division(self, x, y, index, dividend, divisor):
+        # Question Number
+        self.set_font("Helvetica", "I", 8)
+        self.set_xy(x - 5, y)
+        self.cell(10, 5, f"{index}.", ln=False)
+        self.set_font("Courier", "B", 16)
+
+        # Divisor
+        divisor_str = str(divisor)
+        self.set_xy(x - 2, y + 5)
+        self.cell(10, 10, divisor_str.rjust(2), ln=False, align="R")
+
+        # Dividend
+        div_str = str(dividend)
+        self.set_xy(x + 12, y + 5)
+        self.cell(20, 10, div_str, ln=False, align="L")
+
+        # Placeholder Oblique Bracket
+        line_w = 5 + (len(div_str) * 4)
+        self.line(x + 10, y + 6, x + 10 + line_w, y + 6) # Top Roof
+        self.line(x + 10, y + 6, x + 8, y + 14)         # Side Slant
 
     def add_answer_key(self, all_answers):
         self.add_page()
@@ -65,7 +88,8 @@ class MathPDF(FPDF):
 
             line_str = ""
             for i, (t, b, o, res) in enumerate(answers, 1):
-                ans_text = f"{i}. {t}{o}{b}={res}"
+                display_op = "÷" if o == "/" else o
+                ans_text = f"{i}. {t}{display_op}{b}={res}"
                 line_str += ans_text.ljust(25)
 
                 if i % 4 == 0:
@@ -86,16 +110,25 @@ def run_generator():
     
     for tier in config_data['tiers']:
         layout = tier.get('layout', 'expanded')
+        op = tier['operation']
 
-        if layout == "grid":
-            problems_per_page = 50
-            cols = 5
+        # Determine page capacity and grid spacing
+        if op == "/":
+            problems_per_page, cols = 16, 4
+            y_spacing = 65
+            y_base = 27
+        elif layout == "grid":
+            problems_per_page, cols = 50, 5
+            y_spacing = 22
+            y_base = 30
         elif layout == "list":
-            problems_per_page = 40
-            cols = 2
+            problems_per_page, cols = 40, 2
+            y_spacing = 12
+            y_base = 30
         else:
-            problems_per_page = 24
-            cols = 4
+            problems_per_page, cols = 24, 4
+            y_spacing = 40
+            y_base = 40
 
         total_problems = tier['pages'] * problems_per_page
         
@@ -107,33 +140,43 @@ def run_generator():
                 current_page_title = f"{tier['name']} - Part {page_num}"
                 pdf.add_worksheet_page(current_page_title)
                 all_answers[current_page_title] = []
-            
-            top = random.randint(tier['min_top'], tier['max_top'])
-            bot = random.randint(tier['min_bot'], tier['max_bot'])
-            op = tier['operation']
-            
-            if op == "-" and top < bot:
-                top, bot = bot, top
-            
-            # Use simple conditional logic for result calculation
-            if op == "+": res = top + bot
-            elif op == "-": res = top - bot
-            else: res = top * bot
-            
+
+            if op == "/":
+                d_digits = tier.get('dividend_digit', 3)
+                v_digits = tier.get('divisor_digit', 1)
+
+                q_digits = max(1, d_digits - v_digits + 1)
+                divisor = random.randint(10**(v_digits-1), (10**v_digits)-1)
+                quotient = random.randint(10**(q_digits-1), (10**q_digits)-1)
+                dividend = quotient * divisor
+
+                if len(str(dividend)) > d_digits:
+                    dividend = random.randint(10**(d_digits-1), (10**d_digits)-1)
+                    quotient = dividend // divisor
+
+                res, top, bot = quotient, dividend, divisor
+            else:
+                top = random.randint(tier['min_top'], tier['max_top'])
+                bot = random.randint(tier['min_bot'], tier['max_bot'])
+                if op == "-" and top < bot:
+                    top, bot = bot, top
+                res = (top + bot) if op == "+" else (top - bot) if op == "-" else (top * bot)
+
             all_answers[current_page_title].append((top, bot, op, res))
             
-            # Routing logic based on layout type
-            if layout == "grid":
-                x = 15 + (local_idx % cols * 38)
-                y = 30 + (local_idx // cols * 22)
+            x_base = 15 if layout == "grid" else 20
+            x_spacing = 38 if layout == "grid" else 90 if layout == "list" else 45
+
+            x = x_base + (local_idx % cols * x_spacing)
+            y = y_base + (local_idx // cols * y_spacing)
+
+            if op == "/" and layout == "expanded":
+                pdf.draw_problem_division(x, y, local_idx + 1, top, bot)
+            elif layout == "grid":
                 pdf.draw_problem_grid(x, y, local_idx + 1, top, bot, op)
             elif layout == "list":
-                x = 20 + (local_idx % cols * 90)
-                y = 30 + (local_idx // cols * 12)
                 pdf.draw_problem_list(x, y, local_idx + 1, top, bot, op)
             else:
-                x = 20 + (local_idx % cols * 45)
-                y = 40 + (local_idx // cols * 40)
                 pdf.draw_problem_expanded(x, y, local_idx + 1, top, bot, op)
             
     pdf.add_answer_key(all_answers)
