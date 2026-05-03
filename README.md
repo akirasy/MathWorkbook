@@ -65,6 +65,26 @@ For division, the script uses digit-based constraints instead of min/max values.
 | List | 40 | Mental math and quick drills |
 | Grid | 50 | High-density practice in a structured box |
 
+## Gallery: Layout Examples
+
+### Vertical & Long-Form (Expanded)
+
+| Subtraction | Division |
+|:---:|:---:|
+| <img src="img/expanded-substraction.png" width="250"> | <img src="img/expanded-division.png" width="250"> |
+
+### Drill & Grid Formats
+
+| Addition (List) | Multiplication (Grid) |
+|:---:|:---:|
+| <img src="img/list-addition.png" width="250"> | <img src="img/grid-multiplication.png" width="250"> |
+
+### Answer Key
+
+| Addition (List) |
+|:---:|
+| <img src="img/answer-sheet.png" width="250"> |
+
 ## Usage
 
 Run the generator from your terminal:
